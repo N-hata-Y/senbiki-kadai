@@ -1,0 +1,43 @@
+# 黄色マーカー(7個)による位置合わせの設定
+# パスはプロジェクトルートからの相対パス (絶対パスも可)
+
+[paths]
+input_dir = "output/test_images"     # 入力画像のディレクトリ
+reference = "original_1.png"         # 基準画像 (記入前テンプレート)
+targets = "page_*.png"               # 位置合わせする画像 (glob)
+output_dir = "output/aligned"        # 出力先
+
+[marker]
+num_markers = 7                      # 黄色マーカーの個数
+# 検出は縮小画像で行い、元解像度で重心を再計算する
+detect_scale = 0.25
+# HSV (OpenCV: H 0-179, S/V 0-255)
+# 背景の黄緑は H≈33-36, S≈255 なので S の上限で除外する
+hsv_lower = [15, 60, 150]
+hsv_upper = [30, 235, 255]
+# 縮小画像上での面積の範囲 [px] (600dpi・detect_scale=0.25 で 1 個 ≈ 1700px)
+min_area = 500
+max_area = 5000
+# 外接矩形の縦横比の許容範囲 (円なら ≈1.0)
+max_aspect_diff = 0.3
+# --- 中心の決定: マーカー中央の黒点をテンプレートマッチングで探す ---
+# (黄色領域の重心は陰影の影響で数十px ずれるため使わない)
+dot_radius = 19                      # 黒点の半径 [px] (600dpi で約 19px)
+search_radius = 150                  # 黄色領域の中心から黒点を探す範囲 [px]
+min_dot_score = 0.5                  # 正規化相互相関の下限 (通常 0.65〜0.95)
+
+[transform]
+# "homography" (8自由度) / "affine" (6自由度) / "similarity" (回転+拡縮+平行移動)
+# 印刷・スキャンの歪みがあるため homography が最も残差が小さい (平均 1〜2px)
+method = "homography"
+# false: 7点すべての最小二乗 / true: RANSAC で外れ点を除外
+robust = false
+ransac_thresh = 3.0                  # robust = true のときの外れ点しきい値 [px]
+# 対応点の残差 RMS [px] がこれを超えたら警告する
+max_rms = 5.0
+
+[output]
+save_aligned = true                  # 位置合わせ後の画像を保存
+save_overlay = true                  # 基準画像との重ね合わせ確認画像を保存
+save_markers = true                  # マーカー検出結果の画像を保存
+preview_scale = 0.25                 # 確認画像 (overlay/markers) の縮小率

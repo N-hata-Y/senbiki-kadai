@@ -707,6 +707,7 @@ dependencies = [
     { name = "opencv-python" },
     { name = "pdf2image" },
     { name = "scikit-learn" },
+    { name = "scipy" },
 ]
 
 [package.metadata]
@@ -717,6 +718,7 @@ requires-dist = [
     { name = "opencv-python", specifier = ">=5.0.0.93" },
     { name = "pdf2image", specifier = ">=1.17.0" },
     { name = "scikit-learn", specifier = ">=1.9.1" },
+    { name = "scipy", specifier = ">=1.18.1" },
 ]
 
 [[package]]
